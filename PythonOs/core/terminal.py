@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QTextEdit, QLineEdit, QPushButton,
-    QInputDialog, QMessageBox
+    QInputDialog, QMessageBox, QApplication
 )
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QColor, QTextCharFormat, QTextCursor, QFont, QKeyEvent
@@ -9,6 +9,8 @@ import random
 import time
 import pyfiglet  # za ASCII art generisanje (pip install pyfiglet)
 import requests  # <-- dodato za joke API
+import subprocess
+import sys
 
 
 class TerminalScreen(QWidget):
@@ -165,12 +167,12 @@ class TerminalScreen(QWidget):
         cmd_lower = cmd.lower()
         if self.neofetch_anim_running or self.ascii_anim_running:
             self.neofetch_anim_running = False
-            self.ascii_anim_running = False  # stop any running animations immediately
+            self.ascii_anim_running = False
 
         self.print_prompt(cmd)
         self._log(f"Command entered: {cmd}")
 
-        # Command dispatch
+        # Add your new commands here!
         commands = {
             "help": self.show_help,
             "neofetch": self.start_neofetch_animation,
@@ -188,16 +190,19 @@ class TerminalScreen(QWidget):
             "clear": self.clear_output,
             "random_joke": self.random_joke,
             "fortune": self.show_fortune,
+            "color": self.color,         # <-- add this
+            "colora": self.colora,       # <-- add this (implement colora method)
+            "cquit": self.cquit,         # <-- add this (implement cquit method)
+            "hack": self.hack,           # <-- add this (implement hack method)
+            "hackfbi": self.hackfbi,     # <-- already implemented above
         }
 
         func = commands.get(cmd_lower)
         if func:
             func()
         else:
-            self.print_error(self._lang(
-                "Unknown command. Type 'help' for available commands.",
-                "Nepoznata komanda. Ukucajte 'help' za dostupne komande."
-            ))
+            # pip_install and other dynamic commands
+            self.handle_command(cmd_lower)
 
         self.save_user_data()
 
@@ -228,6 +233,7 @@ class TerminalScreen(QWidget):
                 "logout       - logout current user",
                 "en           - set English language",
                 "sr           - set Serbian language",
+                "pip_install <package> - install Python package",
                 "quit/exit    - exit program"
             ]
         else:
@@ -245,6 +251,7 @@ class TerminalScreen(QWidget):
                 "logout       - odjava korisnika",
                 "en           - postavi engleski jezik",
                 "sr           - postavi srpski jezik",
+                "pip_install <package> - instaliraj Python paket",
                 "quit/exit    - izlaz iz programa"
             ]
         self.print_info("=== Commands ===" if self.language == 0 else "=== Komande ===")
@@ -296,7 +303,35 @@ class TerminalScreen(QWidget):
                 self.print_line(line, color="yellow")
         except Exception as e:
             self.print_error(self._lang(f"Error generating ASCII art: {e}", f"Greška prilikom generisanja ASCII umetnosti: {e}"))
+    def hackfbi(self) -> None:
+        for i in range(10):
+            self.print_line(f"Hacking FBI... {i+1}/10", color="red", bold=True)
+            QApplication.processEvents()
+            time.sleep(1) 
+        self.print_line("Text color reset to default.", color="white", bold=False)
+        self.print_info(self._lang("FBI hacked successfully!", "FBI uspešno hakovan!"))
+    def color (self) -> None:
+        self.print_line("This is green text.", color="green", bold=True)
+        self.print_line("Text color reset to default.", color="white", bold=False)
+        self.print_info(self._lang("Color demonstration complete.", "Demonstracija boja završena."))
 
+        
+    def colora(self):
+        self.print_line("This is red text.", color="red", bold=True)
+        self.print_line("Text color reset to default.", color="white", bold=False)
+        self.print_info(self._lang("Red color demonstration complete.", "Demonstracija crvene boje završena."))
+
+    def cquit(self):
+        self.print_line("Text color reset to default.", color="white", bold=False)
+        self.print_info(self._lang("Color reset complete.", "Boja resetovana."))
+
+    def hack(self):
+        for i in range(10):
+            self.print_line(f"Matrix hack... {i+1}/10", color="green", bold=True)
+            QApplication.processEvents()
+            time.sleep(0.1)
+        self.print_line("Text color reset to default.", color="white", bold=False)
+        self.print_info(self._lang("Matrix hack complete!", "Matrix hack završen!"))
     # --- Simple ASCII animation ---
     def start_ascii_animation(self) -> None:
         if self.ascii_anim_running:
@@ -529,3 +564,29 @@ class TerminalScreen(QWidget):
         ]
         fortune = random.choice(fortunes_en if self.language == 0 else fortunes_sr)
         self.print_info(f"Fortune: {fortune}")
+
+    def handle_command(self, cmd):
+        try:
+            if cmd.startswith("pip_install "):
+                package = cmd.split(" ", 1)[1]
+                self.print_info(f"Installing package: {package} ...")
+                try:
+                    result = subprocess.run(
+                        [sys.executable, "-m", "pip", "install", package],
+                        capture_output=True, text=True
+                    )
+                    self.print_info(result.stdout)
+                    if result.stderr:
+                        self.print_error(result.stderr)
+                except Exception as e:
+                    self.print_error(f"Error: {e}")
+            elif cmd == "help":
+                self.show_help()
+            else:
+                self.print_error(self._lang(
+                    "Unknown command. Type 'help' for available commands.",
+                    "Nepoznata komanda. Ukucajte 'help' za dostupne komande."
+                ))
+        except Exception as e:
+            self.print_error(f"Internal error: {e}")
+
