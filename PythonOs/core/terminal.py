@@ -11,6 +11,7 @@ import pyfiglet  # za ASCII art generisanje (pip install pyfiglet)
 import requests  # <-- dodato za joke API
 import subprocess
 import sys
+import webbrowser
 
 
 class TerminalScreen(QWidget):
@@ -190,11 +191,11 @@ class TerminalScreen(QWidget):
             "clear": self.clear_output,
             "random_joke": self.random_joke,
             "fortune": self.show_fortune,
-            "color": self.color,         # <-- add this
-            "colora": self.colora,       # <-- add this (implement colora method)
-            "cquit": self.cquit,         # <-- add this (implement cquit method)
-            "hack": self.hack,           # <-- add this (implement hack method)
-            "hackfbi": self.hackfbi,     # <-- already implemented above
+            "color": self.color,         
+            "colora": self.colora,       
+            "cquit": self.cquit,        
+            "hack": self.hack,           
+            "hackfbi": self.hackfbi,     
         }
 
         func = commands.get(cmd_lower)
@@ -234,6 +235,12 @@ class TerminalScreen(QWidget):
                 "en           - set English language",
                 "sr           - set Serbian language",
                 "pip_install <package> - install Python package",
+                "hackfbi      - hack FBI (just for fun)",
+                "color        - show green text",
+                "colora       - show red text",
+                "cquit        - reset text color",
+                "hack         - simple matrix hack animation",
+                "search <text> - search on Google",
                 "quit/exit    - exit program"
             ]
         else:
@@ -252,6 +259,12 @@ class TerminalScreen(QWidget):
                 "en           - postavi engleski jezik",
                 "sr           - postavi srpski jezik",
                 "pip_install <package> - instaliraj Python paket",
+                "search <text> - pretraga na Google",
+                "hackfbi      - hakuj FBI (samo za zabavu)",
+                "color        - prikaži zeleni tekst",
+                "colora       - prikaži crveni tekst",
+                "cquit        - resetuj boju teksta",
+                "hack         - jednostavna matrica animacija",
                 "quit/exit    - izlaz iz programa"
             ]
         self.print_info("=== Commands ===" if self.language == 0 else "=== Komande ===")
@@ -349,6 +362,10 @@ class TerminalScreen(QWidget):
         self.ascii_anim_index = 0
         self.output.clear()
         self.animate_ascii_frames()
+    def search(self, text: str) -> None:
+        self.print_info(self._lang("Searching for:", "Tražim:") + f" {text}")
+        self.input("Enter text to search: ")
+        webbrowser.open(f"https://www.google.com/search?q={text}")
 
     def animate_ascii_frames(self) -> None:
         if not self.ascii_anim_running:
@@ -589,4 +606,5 @@ class TerminalScreen(QWidget):
                 ))
         except Exception as e:
             self.print_error(f"Internal error: {e}")
+
 
