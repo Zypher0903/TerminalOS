@@ -365,7 +365,7 @@ class TerminalScreen(QWidget):
     def search(self, text: str) -> None:
         self.print_info(self._lang("Searching for:", "Tražim:") + f" {text}")
         self.input("Enter text to search: ")
-        webbrowser.open(f"https://www.google.com/search?q={text}")
+        webbrowser.open(f"https://www.google.com/search?q={text}.com " or f"https://www.google.com/search?q={text}" or f"https://www.google.com/search?q={text}.org" or f"https://www.google.com/search?q={text}.net" or f"https://www.google.com/search?q={text}.edu" or f"https://www.google.com/search?q={text}.gov" or f"https://www.google.com/search?q={text}.io" or f"https://www.google.com/search?q={text}.co.uk" or f"https://www.google.com/search?q={text}.ca" or f"https://www.google.com/search?q={text}.au" or f"https://www.google.com/search?q={text}.de" or f"https://www.google.com/search?q={text}.fr" or f"https://www.google.com/search?q={text}.jp" or f"https://www.google.com/search?q={text}.ru" or f"https://www.google.com/search?q={text}.cn" or f"https://www.google.com/search?q={text}.br" or f"https://www.google.com/search?q={text}.in" or f"https://www.google.com/search?q={text}.it" or f"https://www.google.com/search?q={text}.es" or f"https://www.google.com/search?q={text}.nl" or f"https://www.google.com/search?q={text}.se" or f"https://www.google.com/search?q={text}.pl" or f"https://www.google.com/search?q={text}.no" or f"https://www.google.com/search?q={text}.fi" or f"https://www.google.com/search?q={text}.dk" or f"https://www.google.com/search?q={text}.ch" or f"https://www.google.com/search?q={text}.be" or f"https://www.google.com/search?q={text}.at" or f"https://www.google.com/search?q={text}.cz" or f"https://www.google.com/search?q={text}.hu" or f"https://www.google.com/search?q={text}.ro" or f"https://www.google.com/search?q={text}.tr" or f"https://www.google.com/search?q={text}.gr" or f"https://www.google.com/search?q={text}.il" or f"https://www.google.com/search?q={text}.za")
 
     def animate_ascii_frames(self) -> None:
         if not self.ascii_anim_running:
@@ -606,5 +606,7 @@ class TerminalScreen(QWidget):
                 ))
         except Exception as e:
             self.print_error(f"Internal error: {e}")
+
+
 
 
