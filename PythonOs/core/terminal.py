@@ -144,20 +144,38 @@ class TerminalScreen(QWidget):
 
     def print_info(self, text: str) -> None:
         self.print_line(text, color="lime", bold=False)
-    def dos_attack(self):
-        target, ok = QInputDialog.getText(self, "DDoS Attack", "Enter target IP or URL:")
-        while True:
-            r = requests.get(f"http://{target}")
-            self.print_info(f"Sent request to {target}, status code: {r.status_code}")
+    def dos_attack(self) -> None:
+        """Perform a simple DoS attack (for educational purposes only)."""
+        target, ok = QInputDialog.getText(self, "DDoS Attack", self._lang("Enter target IP or URL:", "Unesite ciljnu IP adresu ili URL:"))
+        if not ok or not target.strip():
+            self.print_info(self._lang("DoS attack cancelled.", "DoS napad otkazan."))
+            return
 
+        try:
+            num_requests, ok = QInputDialog.getInt(self, "DDoS Attack", self._lang("Enter number of requests:", "Unesite broj zahteva:"))
+            if not ok or num_requests <= 0:
+                self.print_info(self._lang("DoS attack cancelled.", "DoS napad otkazan."))
+                return
+
+            self.print_info(self._lang(f"Starting DoS attack on {target}...", f"Pokrećem DoS napad na {target}..."))
+            for i in range(num_requests):
+                try:
+                    response = requests.get(f"http://{target}", timeout=5)
+                    self.print_info(self._lang(f"Request {i+1}/{num_requests} sent. Status code: {response.status_code}",
+                                               f"Zahtev {i+1}/{num_requests} poslat. Statusni kod: {response.status_code}"))
+                except Exception as e:
+                    self.print_error(self._lang(f"Request {i+1} failed: {e}", f"Zahtev {i+1} nije uspeo: {e}"))
+                    break
+
+            self.print_info(self._lang("DoS attack completed.", "DoS napad završen."))
+        except Exception as e:
+            self.print_error(self._lang(f"Error: {e}", f"Greška: {e}"))
     def print_ascii_banner(self) -> None:
         banner = [
-            " ____        _        _   ____   ____   ",
-            "| __ )  __ _| |_ __ _| | |___ \\ |___ \\  ",
-            "|  _ \\ / _` | __/ _` | |   __) |  __) | ",
-            "| |_) | (_| | || (_| | |  / __/  / __/  ",
-            "|____/ \\__,_|\\__\\__,_|_| |_____| |_____|",
-            "                                        "
+            "| \ | |/ _ \ \   / / \    |___ /| || |  ", 
+            "|  \| | | | \ \ / / _ \     |_ \| || |_ ", 
+            "| |\  | |_| |\ V / ___ \   ___) |__   _|", 
+            "|_| \_|\___/  \_/_/   \_\ |____/   |_|",   
         ]
         for line in banner:
             self.print_line(line, color="#00FFFF", bold=True)
@@ -201,7 +219,10 @@ class TerminalScreen(QWidget):
             "cquit": self.cquit,        
             "hack": self.hack,           
             "hackfbi": self.hackfbi,     
-            "dos_attack": self.dos_attack
+            "dos_attack": self.dos_attack,
+            "search": self.search,  # Fixed search command
+            "wiki": self.wiki,        # Added wiki command
+            "youtube": self.youtube,  # Added youtube command
         }
 
         func = commands.get(cmd_lower)
@@ -248,6 +269,8 @@ class TerminalScreen(QWidget):
                 "hack         - simple matrix hack animation",
                 "search <text> - search on Google",
                 "dods_attack <target> - perform a simple DoS attack (for educational purposes only)",
+                "wiki        - search on Wikipedia",
+                "youtube     - search on YouTube",
                 "quit/exit    - exit program"
             ]
         else:
@@ -273,6 +296,8 @@ class TerminalScreen(QWidget):
                 "cquit        - resetuj boju teksta",
                 "hack         - jednostavna matrica animacija",
                 "dods_attack <target> - izvrši jednostavan DoS napad (samo u edukativne svrhe)",
+                "wiki        - pretraga na Wikipediji",
+                "youtube     - pretraga na YouTube-u",
                 "quit/exit    - izlaz iz programa"
             ]
         self.print_info("=== Commands ===" if self.language == 0 else "=== Komande ===")
@@ -309,7 +334,14 @@ class TerminalScreen(QWidget):
 
         self.current_line = (self.current_line + 1) % len(self.ascii_art)
         QTimer.singleShot(150, self.animate_ascii_light)
+    def youtube(self) -> None:
+        text, ok = QInputDialog.getText(self, "YouTube Search", self._lang("Enter term to search on YouTube:", "Unesite pojam za pretragu na YouTube-u:"))
+        if not ok or not text.strip():
+            self.print_info(self._lang("YouTube search cancelled.", "Pretraga na YouTube-u otkazana."))
+            return
 
+        self.print_info(self._lang(f"Searching YouTube for: {text}", f"Tražim na YouTube-u: {text}"))
+        webbrowser.open(f"https://www.youtube.com/results?search_query={text.replace(' ', '+')}")
     # --- ASCII Text generator (pyfiglet) ---
     def generate_ascii_text(self) -> None:
         text, ok = QInputDialog.getText(self, "ASCII Text", self._lang("Enter text to convert to ASCII art:", "Unesite tekst za ASCII umetnost:"))
@@ -324,6 +356,14 @@ class TerminalScreen(QWidget):
                 self.print_line(line, color="yellow")
         except Exception as e:
             self.print_error(self._lang(f"Error generating ASCII art: {e}", f"Greška prilikom generisanja ASCII umetnosti: {e}"))
+    def wiki(self) -> None:
+        text, ok = QInputDialog.getText(self, "Wikipedia Search", self._lang("Enter term to search on Wikipedia:", "Unesite pojam za pretragu na Wikipediji:"))
+        if not ok or not text.strip():
+            self.print_info(self._lang("Wikipedia search cancelled.", "Pretraga na Wikipediji otkazana."))
+            return
+
+        self.print_info(self._lang(f"Searching Wikipedia for: {text}", f"Tražim na Wikipediji: {text}"))
+        webbrowser.open(f"https://en.wikipedia.org/wiki/{text.replace(' ', '_')}")
     def hackfbi(self) -> None:
         for i in range(10):
             self.print_line(f"Hacking FBI... {i+1}/10", color="red", bold=True)
@@ -370,10 +410,16 @@ class TerminalScreen(QWidget):
         self.ascii_anim_index = 0
         self.output.clear()
         self.animate_ascii_frames()
-    def search(self, text: str) -> None:
-        self.print_info(self._lang("Searching for:", "Tražim:") + f" {text}")
-        self.input("Enter text to search: ")
-        webbrowser.open(f"https://www.google.com/search?q={text}.com " or f"https://www.google.com/search?q={text}" or f"https://www.google.com/search?q={text}.org" or f"https://www.google.com/search?q={text}.net" or f"https://www.google.com/search?q={text}.edu" or f"https://www.google.com/search?q={text}.gov" or f"https://www.google.com/search?q={text}.io" or f"https://www.google.com/search?q={text}.co.uk" or f"https://www.google.com/search?q={text}.ca" or f"https://www.google.com/search?q={text}.au" or f"https://www.google.com/search?q={text}.de" or f"https://www.google.com/search?q={text}.fr" or f"https://www.google.com/search?q={text}.jp" or f"https://www.google.com/search?q={text}.ru" or f"https://www.google.com/search?q={text}.cn" or f"https://www.google.com/search?q={text}.br" or f"https://www.google.com/search?q={text}.in" or f"https://www.google.com/search?q={text}.it" or f"https://www.google.com/search?q={text}.es" or f"https://www.google.com/search?q={text}.nl" or f"https://www.google.com/search?q={text}.se" or f"https://www.google.com/search?q={text}.pl" or f"https://www.google.com/search?q={text}.no" or f"https://www.google.com/search?q={text}.fi" or f"https://www.google.com/search?q={text}.dk" or f"https://www.google.com/search?q={text}.ch" or f"https://www.google.com/search?q={text}.be" or f"https://www.google.com/search?q={text}.at" or f"https://www.google.com/search?q={text}.cz" or f"https://www.google.com/search?q={text}.hu" or f"https://www.google.com/search?q={text}.ro" or f"https://www.google.com/search?q={text}.tr" or f"https://www.google.com/search?q={text}.gr" or f"https://www.google.com/search?q={text}.il" or f"https://www.google.com/search?q={text}.za")
+    def search(self) -> None:
+        """Search for a term on Google."""
+        text, ok = QInputDialog.getText(self, "Search", self._lang("Enter text to search:", "Unesite tekst za pretragu:"))
+        if not ok or not text.strip():
+            self.print_info(self._lang("Search cancelled.", "Pretraga otkazana."))
+            return
+
+        self.print_info(self._lang(f"Searching for: {text}", f"Tražim: {text}"))
+        # Open the search query in the default web browser
+        webbrowser.open(f"https://www.google.com/search?q={text}")
 
     def animate_ascii_frames(self) -> None:
         if not self.ascii_anim_running:
@@ -614,8 +660,6 @@ class TerminalScreen(QWidget):
                 ))
         except Exception as e:
             self.print_error(f"Internal error: {e}")
-
-
 
 
 
