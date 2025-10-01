@@ -12,7 +12,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "terminalos=main:main",  # Entry point for the terminalos command
+            "terminalos=main:main.py",  # Entry point for the terminalos command
         ],
     },
     author="Your Name",
