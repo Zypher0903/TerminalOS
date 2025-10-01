@@ -4,6 +4,7 @@ setup(
     name="TerminalOS",
     version="1.0",
     packages=find_packages(),  # Automatically include all packages (like `core`)
+    py_modules=["main"],  # Include the `main.py` file
     include_package_data=True,  # Include non-code files specified in MANIFEST.in
     install_requires=[
         "PyQt6",
@@ -12,7 +13,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "terminalos=main:main.py",  # Entry point for the terminalos command
+            "terminalos=main:main",  # Entry point for the terminalos command
         ],
     },
     author="Your Name",
