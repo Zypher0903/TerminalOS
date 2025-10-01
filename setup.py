@@ -3,7 +3,8 @@ from setuptools import setup, find_packages
 setup(
     name="TerminalOS",
     version="1.0",
-    packages=find_packages(),
+    packages=find_packages(),  # Automatically include all packages (like `core`)
+    py_modules=["main"],  # Include the `main.py` file
     install_requires=[
         "PyQt6",
         "requests",
@@ -11,7 +12,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "terminalos=main:main",
+            "terminalos=main:main",  # Entry point for the terminalos command
         ],
     },
     author="Your Name",
