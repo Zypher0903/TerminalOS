@@ -1,0 +1,14 @@
+{
+    "admin": {
+        "password": "admin123",
+        "language": 0,
+        "history": [],
+        "notes": []
+    },
+    "a": {
+        "password": "a",
+        "language": 0,
+        "history": [],
+        "notes": []
+    }
+}
