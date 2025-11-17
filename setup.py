@@ -15,7 +15,7 @@ setup(
             "terminalos=main:main",  # Entry point for the terminalos command
         ],
     },
-    author="Your Name",
+    author="Edin & David",
     author_email="edintahiri.2013@gmail.com",
     description="TerminalOS - A Python-based terminal application",
     url="https://github.com/Zypher0903/TerminalOS",
